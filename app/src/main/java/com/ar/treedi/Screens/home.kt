@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -58,6 +59,14 @@ fun Home(){
                         .background(color = accentGreen)
                         .padding(20.dp)
                 ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.treedi_logo),
+                        modifier = Modifier
+                            .width(130.dp),
+                        contentDescription = "scan",
+                        contentScale = ContentScale.FillWidth
+                    )
+
                     Text(
                         text = "Treedi",
                         style = h1
