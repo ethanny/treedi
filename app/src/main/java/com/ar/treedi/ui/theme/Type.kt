@@ -15,7 +15,7 @@ object AppTypography {
         fontSize = 36.sp,
         fontFamily = FontFamily(Font(R.font.inter)),
         fontWeight = FontWeight.Medium,
-        color = Color(0xFF00573F),
+        color = primaryGreen,
         platformStyle = PlatformTextStyle(includeFontPadding = false),
         letterSpacing = -1.sp
         )
