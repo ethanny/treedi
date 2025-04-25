@@ -28,6 +28,14 @@ object AppTypography {
         letterSpacing = -1.sp
         )
 
+    val h3 = TextStyle(
+        fontSize = 18.sp,
+        fontFamily = FontFamily(Font(R.font.inter)),
+        fontWeight = FontWeight.Normal,
+        platformStyle = PlatformTextStyle(includeFontPadding = false),
+        letterSpacing = -1.sp
+    )
+
     val b1 = TextStyle(
         fontSize = 14.sp,
         fontFamily = FontFamily(Font(R.font.inter)),
