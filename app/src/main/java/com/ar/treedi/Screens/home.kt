@@ -40,67 +40,86 @@ import com.composables.icons.lucide.Move3d
 import com.composables.icons.lucide.ScanBarcode
 import com.composables.icons.lucide.ScanLine
 import com.composables.icons.lucide.ZoomIn
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+
 
 @Composable
 fun Home(){
     val scrollState = rememberScrollState()
-    Scaffold(
-        containerColor = Color.White,
-        content = { paddingValues ->
-            Column(
-                modifier = Modifier
-                    .padding(paddingValues)
-                    .verticalScroll(scrollState)
-            ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(color = accentGreen)
-                        .padding(20.dp)
-                ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.treedi_logo),
+    val navController = rememberNavController()
+
+    NavHost(navController = navController, startDestination = "home") {
+        composable("home") {
+            Scaffold(
+                containerColor = Color.White,
+                content = { paddingValues ->
+                    Column(
                         modifier = Modifier
-                            .width(130.dp),
-                        contentDescription = "scan",
-                        contentScale = ContentScale.FillWidth
-                    )
+                            .padding(paddingValues)
+                            .verticalScroll(scrollState)
+                    ) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(color = accentGreen)
+                                .padding(20.dp)
+                        ) {
+                            Image(
+                                painter = painterResource(id = R.drawable.treedi_logo),
+                                modifier = Modifier
+                                    .width(130.dp),
+                                contentDescription = "scan",
+                                contentScale = ContentScale.FillWidth
+                            )
 
-                    Text(
-                        text = "Treedi",
-                        style = h1
-                    )
+                            Text(
+                                text = "Treedi",
+                                style = h1
+                            )
 
-                    Spacer(Modifier.height(10.dp))
+                            Spacer(Modifier.height(10.dp))
 
-                    Text(
-                        text = "Get to know UP Cebu’s Trees in 3D!",
-                        style = h3
-                    )
+                            Text(
+                                text = "Get to know UP Cebu’s Trees in 3D!",
+                                style = h3
+                            )
 
-                    Spacer(Modifier.height(20.dp))
+                            Spacer(Modifier.height(20.dp))
 
-                    ActionButton("Start scanning", icon = Lucide.ScanLine, {})
+                            ActionButton("Start scanning", icon = Lucide.ScanLine, {
+                                navController.navigate("qr_scan")
+                            })
+                        }
+
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(20.dp, Alignment.Top),
+                            horizontalAlignment = Alignment.Start,
+                            modifier = Modifier
+                                .padding(20.dp)
+                        ) {
+                            findSection()
+                            section(Lucide.ScanBarcode, "Scan", "Scan the code on the tree using your phone’s camera.", R.drawable.hand_scan)
+                            section(Lucide.Move3d, "Interact", "Get up close with a lifelike 3D tree model. Rotate, zoom, and \n" +
+                                    "explore every detail.", R.drawable.interact)
+                            section(Lucide.BookOpenText, "Learn", "Learn all about the tree’s unique features, its ecological background, and uses.", R.drawable.learn)
+
+                            ActionButton("I'm ready to scan", icon = Lucide.ScanLine, {})
+                        }
+                    }
                 }
-
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(20.dp, Alignment.Top),
-                    horizontalAlignment = Alignment.Start,
-                    modifier = Modifier
-                        .padding(20.dp)
-                ) {
-                    findSection()
-                    section(Lucide.ScanBarcode, "Scan", "Scan the code on the tree using your phone’s camera.", R.drawable.hand_scan)
-                    section(Lucide.Move3d, "Interact", "Get up close with a lifelike 3D tree model. Rotate, zoom, and \n" +
-                            "explore every detail.", R.drawable.interact)
-                    section(Lucide.BookOpenText, "Learn", "Learn all about the tree’s unique features, its ecological background, and uses.", R.drawable.learn)
-
-                    ActionButton("I'm ready to scan", icon = Lucide.ScanLine, {})
-                }
+            )
+        }
+        composable("qr_scan") {
+            QRScanScreen { scannedCode ->
+                navController.navigate("tree_detail/$scannedCode")
             }
         }
-    )
+    }
+
+
 }
 
 @Composable
