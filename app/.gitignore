@@ -12,6 +12,9 @@ gradle-app.setting
 gradle-app.setting.lock
 gradle-app.lock
 
+# Ignore all .lock files
+*.lock
+
 # IntelliJ IDEA / Android Studio
 .idea/
 *.iml

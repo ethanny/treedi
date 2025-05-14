@@ -29,9 +29,11 @@ import com.ar.treedi.R
 import com.ar.treedi.ui.theme.AppTypography.b1
 import com.ar.treedi.ui.theme.AppTypography.h2
 import com.ar.treedi.ui.theme.accentGreen
+import com.ar.treedi.ui.theme.brown
 import com.ar.treedi.ui.theme.lightGray
 import com.ar.treedi.ui.theme.primaryGreen
 import com.ar.treedi.ui.theme.red
+import com.ar.treedi.ui.theme.yellow
 import com.composables.icons.lucide.ArrowLeft
 import com.composables.icons.lucide.Lucide
 import com.composables.icons.lucide.ScanEye
@@ -114,7 +116,7 @@ fun TreeDetails() {
                     ) {
                         Row() {
                             Image(Lucide.ArrowLeft, contentDescription = "icon", colorFilter = ColorFilter.tint(
-                                red))
+                                yellow))
                             Text("Enedemicity", style = b1.copy(fontWeight = FontWeight.Medium, color = Color.Gray))
                         }
                         Text("Cultivated, not naturalized", style = b1)
