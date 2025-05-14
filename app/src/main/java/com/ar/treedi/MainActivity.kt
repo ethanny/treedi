@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.ar.treedi.Screens.Home
+import com.ar.treedi.Screens.TreeDetails
 import com.ar.treedi.ui.theme.AppTypography.h1
 import com.ar.treedi.ui.theme.TreediTheme
 
@@ -20,7 +21,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            Home()
+            TreeDetails()
         }
     }
 }
