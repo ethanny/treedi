@@ -11,7 +11,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.ar.treedi.Screens.Home
+import com.ar.treedi.Screens.QRScanScreen
 import com.ar.treedi.ui.theme.AppTypography.h1
 import com.ar.treedi.ui.theme.TreediTheme
 
@@ -20,7 +24,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            Home()
+            TreediNav()
         }
     }
 }
@@ -32,6 +36,22 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
         style = h1,
         modifier = modifier
     )
+}
+
+@Composable
+fun TreediNav() {
+    val navController = rememberNavController()
+
+    NavHost(navController = navController, startDestination = "home") {
+        composable("home") {
+            Home(navController) // pass navController down
+        }
+        composable("qr_scan") {
+            QRScanScreen(onCodeScanned = { /* handle result */ }) {
+                navController.popBackStack() // for back button
+            }
+        }
+    }
 }
 
 @Preview(showBackground = true)
