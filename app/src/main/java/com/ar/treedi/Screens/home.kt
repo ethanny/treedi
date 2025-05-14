@@ -45,6 +45,7 @@ import com.composables.icons.lucide.ZoomIn
 fun Home(){
     val scrollState = rememberScrollState()
     Scaffold(
+
         containerColor = Color.White,
         content = { paddingValues ->
             Column(
@@ -69,7 +70,7 @@ fun Home(){
 
                     Text(
                         text = "Treedi",
-                        style = h1
+                        style = h1,
                     )
 
                     Spacer(Modifier.height(10.dp))
