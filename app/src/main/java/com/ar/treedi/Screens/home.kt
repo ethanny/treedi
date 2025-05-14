@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ar.treedi.Components.ActionButton
 import com.ar.treedi.R
@@ -41,6 +42,7 @@ import com.composables.icons.lucide.ScanBarcode
 import com.composables.icons.lucide.ScanLine
 import com.composables.icons.lucide.ZoomIn
 
+@Preview
 @Composable
 fun Home(){
     val scrollState = rememberScrollState()
