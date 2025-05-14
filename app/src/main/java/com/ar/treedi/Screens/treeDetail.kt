@@ -116,7 +116,7 @@ fun TreeDetails() {
                     ) {
                         Row() {
                             Image(Lucide.ArrowLeft, contentDescription = "icon", colorFilter = ColorFilter.tint(
-                                yellow))
+                                red))
                             Text("Enedemicity", style = b1.copy(fontWeight = FontWeight.Medium, color = Color.Gray))
                         }
                         Text("Cultivated, not naturalized", style = b1)
