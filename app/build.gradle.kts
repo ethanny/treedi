@@ -50,6 +50,11 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation("com.composables:icons-lucide:1.0.0")
+    implementation("androidx.camera:camera-camera2:1.3.0")
+    implementation("androidx.camera:camera-lifecycle:1.3.0")
+    implementation("androidx.camera:camera-view:1.3.0")
+    implementation("com.google.mlkit:barcode-scanning:17.2.0")
+    implementation("androidx.navigation:navigation-compose:2.7.4")
     
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

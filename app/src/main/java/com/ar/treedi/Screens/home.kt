@@ -25,6 +25,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.ar.treedi.Components.ActionButton
 import com.ar.treedi.R
 import com.ar.treedi.ui.theme.AppTypography.b1
@@ -41,9 +42,11 @@ import com.composables.icons.lucide.ScanBarcode
 import com.composables.icons.lucide.ScanLine
 import com.composables.icons.lucide.ZoomIn
 
+
 @Composable
-fun Home(){
+fun Home(navController: NavController){
     val scrollState = rememberScrollState()
+
     Scaffold(
         containerColor = Color.White,
         content = { paddingValues ->
@@ -81,7 +84,9 @@ fun Home(){
 
                     Spacer(Modifier.height(20.dp))
 
-                    ActionButton("Start scanning", icon = Lucide.ScanLine, {})
+                    ActionButton("Start scanning", icon = Lucide.ScanLine, {
+                        navController.navigate("qr_scan")
+                    })
                 }
 
                 Column(
@@ -96,7 +101,9 @@ fun Home(){
                             "explore every detail.", R.drawable.interact)
                     section(Lucide.BookOpenText, "Learn", "Learn all about the tree’s unique features, its ecological background, and uses.", R.drawable.learn)
 
-                    ActionButton("I'm ready to scan", icon = Lucide.ScanLine, {})
+                    ActionButton("I'm ready to scan", icon = Lucide.ScanLine, {
+                        navController.navigate("qr_scan")
+                    })
                 }
             }
         }
