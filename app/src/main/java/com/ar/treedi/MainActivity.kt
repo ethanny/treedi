@@ -16,6 +16,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.ar.treedi.Screens.Home
 import com.ar.treedi.Screens.QRScanScreen
+import com.ar.treedi.Screens.TreeDetails
+import com.ar.treedi.Screens.TreeLocations
 import com.ar.treedi.ui.theme.AppTypography.h1
 import com.ar.treedi.ui.theme.TreediTheme
 
@@ -46,6 +48,15 @@ fun TreediNav() {
         composable("home") {
             Home(navController) // pass navController down
         }
+
+        composable("details") {
+            TreeDetails(navController) // pass navController down
+        }
+
+        composable("locations") {
+            TreeLocations(navController) // pass navController down
+        }
+
         composable("qr_scan") {
             QRScanScreen(onCodeScanned = { /* handle result */ }) {
                 navController.popBackStack() // for back button

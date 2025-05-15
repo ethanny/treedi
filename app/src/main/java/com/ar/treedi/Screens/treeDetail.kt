@@ -26,6 +26,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.ar.treedi.Components.IconButton
 import com.ar.treedi.R
 import com.ar.treedi.ui.theme.AppTypography.b1
@@ -44,9 +45,9 @@ import com.composables.icons.lucide.MapPinHouse
 import com.composables.icons.lucide.ScanEye
 import com.composables.icons.lucide.Trees
 
-@Preview
+
 @Composable
-fun TreeDetails() {
+fun TreeDetails(navController: NavController) {
     val scrollState = rememberScrollState()
     Scaffold(
         containerColor = Color.White,
@@ -69,7 +70,7 @@ fun TreeDetails() {
                         modifier = Modifier
                             .fillMaxWidth()
                     ) {
-                        IconButton(Lucide.ArrowLeft, {})
+                        IconButton(Lucide.ArrowLeft, { navController.popBackStack() })
                         IconButton(Lucide.ScanEye, {})
                     }
 

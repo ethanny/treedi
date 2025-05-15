@@ -29,6 +29,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
+import com.ar.treedi.Components.IconButton
 import com.ar.treedi.ui.theme.accentGreen
 import com.ar.treedi.ui.theme.primaryGreen
 import com.ar.treedi.ui.theme.AppTypography.b1
@@ -43,8 +46,8 @@ data class TreeLocation(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TreeLocationsScreen(
-    onBackClick: () -> Unit = {}
+fun TreeLocations(
+    navController: NavController,
 ) {
     val treeLocations = listOf(
         TreeLocation("In front of DBES", "Flame tree"),
@@ -70,15 +73,7 @@ fun TreeLocationsScreen(
                     horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.Start),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    NavButton(
-                        icon = Lucide.ArrowLeft,
-                        onClick = onBackClick,
-                        buttonHeight = 30.dp,
-                        buttonWidth = 36.dp,
-                        iconSize = 24.dp,
-                        backgroundColor = Color(0x2600573F),
-                        iconColor = primaryGreen
-                    )
+                    IconButton(Lucide.ArrowLeft, { navController.popBackStack() })
 
                     Text(
                         "Tree Locations",
@@ -128,9 +123,10 @@ fun TreeLocationItem(treeLocation: TreeLocation) {
 @Preview(showBackground = true)
 @Composable
 fun TreeLocationsScreenPreview() {
+    val navController = rememberNavController()
     MaterialTheme {
         Surface {
-            TreeLocationsScreen()
+            TreeLocations(navController)
         }
     }
 }

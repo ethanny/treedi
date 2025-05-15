@@ -85,7 +85,7 @@ fun Home(navController: NavController){
                     Spacer(Modifier.height(20.dp))
 
                     ActionButton("Start scanning", icon = Lucide.ScanLine, {
-                        navController.navigate("qr_scan")
+                        navController.navigate("details")
                     })
                 }
 
@@ -95,7 +95,7 @@ fun Home(navController: NavController){
                     modifier = Modifier
                         .padding(20.dp)
                 ) {
-                    findSection()
+                    findSection(navController)
                     section(Lucide.ScanBarcode, "Scan", "Scan the code on the tree using your phone’s camera.", R.drawable.hand_scan)
                     section(Lucide.Move3d, "Interact", "Get up close with a lifelike 3D tree model. Rotate, zoom, and \n" +
                             "explore every detail.", R.drawable.interact)
@@ -147,7 +147,7 @@ fun section (
 }
 
 @Composable
-fun findSection (
+fun findSection (navController: NavController
 ){
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -167,6 +167,6 @@ fun findSection (
 
         Spacer(Modifier.height(20.dp))
 
-        ActionButton("View tree locations", Lucide.MapPin, {})
+        ActionButton("View tree locations", Lucide.MapPin, {navController.navigate("locations")})
     }
 }
