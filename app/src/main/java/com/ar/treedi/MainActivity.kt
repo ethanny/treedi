@@ -21,6 +21,8 @@ import com.ar.treedi.Screens.TreeLocations
 import com.ar.treedi.ui.theme.AppTypography.h1
 import com.ar.treedi.ui.theme.TreediTheme
 
+import com.ar.treedi.models.TreeData
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,17 +51,25 @@ fun TreediNav() {
             Home(navController) // pass navController down
         }
 
-        composable("details") {
-            TreeDetails(navController) // pass navController down
+        composable("treeDetail") {
+            val treeData = navController.currentBackStackEntry
+                ?.savedStateHandle
+                ?.get<TreeData>("treeData")
+
+            if (treeData != null) {
+                TreeDetails(navController, treeData)
+            } else {
+                Text("No tree data found.") // Fallback UI
+            }
         }
 
-        composable("locations") {
+        composable("location") {
             TreeLocations(navController) // pass navController down
         }
 
         composable("qr_scan") {
-            QRScanScreen(onCodeScanned = { /* handle result */ }) {
-                navController.popBackStack() // for back button
+            QRScanScreen(navController = navController) {
+                navController.popBackStack()
             }
         }
     }

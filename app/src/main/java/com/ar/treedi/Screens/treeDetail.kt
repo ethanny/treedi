@@ -45,9 +45,10 @@ import com.composables.icons.lucide.MapPinHouse
 import com.composables.icons.lucide.ScanEye
 import com.composables.icons.lucide.Trees
 
+import com.ar.treedi.models.TreeData
 
 @Composable
-fun TreeDetails(navController: NavController) {
+fun TreeDetails(navController: NavController, treeData: TreeData) {
     val scrollState = rememberScrollState()
     Scaffold(
         containerColor = Color.White,
@@ -90,15 +91,15 @@ fun TreeDetails(navController: NavController) {
                         .fillMaxWidth()
                         .padding(20.dp)
                 ) {
-                    Text("Flame Tree", style = h2.copy(color = primaryGreen))
-                    Text("Delonix regia", style = b1.copy(color = primaryGreen))
+                    Text(treeData.nativeName, style = h2.copy(color = primaryGreen))
+                    Text(treeData.scientificName, style = b1.copy(color = primaryGreen))
 
                     Spacer(Modifier.height(20.dp))
 
-                    Text("This tree is noted for its fern-like leaves and flamboyant display of orange-red flowers over summer. In many tropical parts of the world it is grown as an ornamental tree.", style = b1)
-                    Text("Also known as: Peacock flower, royal poinciana, flamboyant, phoenix flower, flame of the forest", style = b1.copy(color = Color.Gray))
-                    Text("Family:", style = b1.copy(color = Color.Gray))
-                    Text("Genus:", style = b1.copy(color = Color.Gray))
+                    Text(treeData.description, style = b1)
+                    Text("Also known as: ${treeData.otherNames}", style = b1.copy(color = Color.Gray))
+                    Text("Family: ${treeData.family}", style = b1.copy(color = Color.Gray))
+                    Text("Genus: ${treeData.genus}", style = b1.copy(color = Color.Gray))
 
                     Spacer(Modifier.height(20.dp))
 
@@ -124,14 +125,14 @@ fun TreeDetails(navController: NavController) {
                             icon = Lucide.MapPinHouse,
                             iconColor = red,
                             title = "Native Location",
-                            description = "Madagascar",
+                            description = treeData.nativeLocation,
                             modifier = Modifier.weight(1f)
                         )
                         EcologicalCard(
                             icon = Lucide.MapPinHouse,
                             iconColor = yellow,
                             title = "Climate",
-                            description = "Tropical and Subtropical",
+                            description = treeData.climate,
                             modifier = Modifier.weight(1f)
                         )
                     }
@@ -141,10 +142,10 @@ fun TreeDetails(navController: NavController) {
                         verticalAlignment = Alignment.Top,
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        EcologicalCard(Lucide.Earth, brown, "Systemic", "Terrestrial", modifier = Modifier.weight(1f))
-                        EcologicalCard(Lucide.Trees, primaryGreen, "Habitat Type", "Forest", modifier = Modifier.weight(1f))
+                        EcologicalCard(Lucide.Earth, brown, "Systemic", treeData.system, modifier = Modifier.weight(1f))
+                        EcologicalCard(Lucide.Trees, primaryGreen, "Habitat Type", treeData.habitatType, modifier = Modifier.weight(1f))
                     }
-                    EcologicalCard(Lucide.Leaf, primaryGreen, "Endemicity", "Cultivated, not naturalized", modifier = Modifier.fillMaxWidth())
+                    EcologicalCard(Lucide.Leaf, primaryGreen, "Endemicity", treeData.endemicity, modifier = Modifier.fillMaxWidth())
                 }
 
                 Column(
@@ -155,7 +156,7 @@ fun TreeDetails(navController: NavController) {
                         .padding(20.dp)
                 ) {
                     Text("Uses", style = h2.copy(color = primaryGreen))
-                    Text("The splendid blooms of royal poinciana have a function beyond mere beauty. The seeds of this showy tree can be roasted to create a strong, coffee-like oil. This essence is employed in crafting scented cosmetic products. Further, the tree shelters diverse insects, with butterflies being noteworthy residents. A striking use involves the tree's bark, which yields a sticky gum, useful as a glue and in paint manufacturing.", style = b1)
+                    Text(treeData.uses, style = b1)
                 }
             }
         }

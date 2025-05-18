@@ -22,21 +22,43 @@ import com.composables.icons.lucide.Lucide
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.common.InputImage
 
+import com.ar.treedi.network.fetchTreeData
+import androidx.navigation.NavController
+import kotlinx.coroutines.launch
 
 @androidx.annotation.OptIn(ExperimentalGetImage::class)
 @Composable
 
-fun QRScanScreen(onCodeScanned: (String) -> Unit, onBackPressed: () -> Unit) {
+fun QRScanScreen(navController: NavController, onBackPressed: () -> Unit) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
+    val coroutineScope = rememberCoroutineScope()
 
     var showOverlay by remember { mutableStateOf(true)}
+    var isFetching by remember { mutableStateOf(false)}
 
     LaunchedEffect(Unit) {
         Handler(Looper.getMainLooper()).postDelayed({
             showOverlay = false
         }, 3000)
     }
+
+    fun handleQrCode(code: String) {
+        if (isFetching) return
+        isFetching = true
+
+        coroutineScope.launch {
+            try {
+                val treeData = fetchTreeData(code)
+
+                navController.currentBackStackEntry?.savedStateHandle?.set("treeData", treeData)
+                navController.navigate("treeDetail")
+            } catch (e: Exception) {
+                isFetching = false
+            }
+        }
+    }
+
     Box(modifier = Modifier.fillMaxSize()) {
         AndroidView(factory = { ctx ->
             val previewView = PreviewView(ctx)
@@ -63,7 +85,7 @@ fun QRScanScreen(onCodeScanned: (String) -> Unit, onBackPressed: () -> Unit) {
                                 barcodeScanner.process(image)
                                     .addOnSuccessListener { barcodes ->
                                         for (barcode in barcodes) {
-                                            barcode.rawValue?.let { onCodeScanned(it) }
+                                            barcode.rawValue?.let { handleQrCode(it) }
                                         }
                                     }
                                     .addOnCompleteListener { imageProxy.close() }
@@ -93,6 +115,5 @@ fun QRScanScreen(onCodeScanned: (String) -> Unit, onBackPressed: () -> Unit) {
                 modifier = Modifier.align(Alignment.Center)
             )
         }
-
     }
 }
