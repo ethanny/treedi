@@ -19,8 +19,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import com.ar.treedi.Components.BackButton
@@ -44,7 +46,8 @@ fun QRScanScreen(navController: NavController, onBackPressed: () -> Unit) {
     val lifecycleOwner = LocalLifecycleOwner.current
     val coroutineScope = rememberCoroutineScope()
 
-    var showOverlay by remember { mutableStateOf(true)}
+    // Always show overlay
+    val showOverlay = true
     var isFetching by remember { mutableStateOf(false)}
     var hasCameraPermission by remember { mutableStateOf(false) }
     var cameraError by remember { mutableStateOf<String?>(null) }
@@ -64,12 +67,6 @@ fun QRScanScreen(navController: NavController, onBackPressed: () -> Unit) {
         } else {
             cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
         }
-    }
-
-    LaunchedEffect(Unit) {
-        Handler(Looper.getMainLooper()).postDelayed({
-            showOverlay = false
-        }, 3000)
     }
 
     fun handleQrCode(code: String) {
@@ -221,9 +218,30 @@ fun QRScanScreen(navController: NavController, onBackPressed: () -> Unit) {
         )
 
         if (showOverlay) {
-            QROverlay(
+            // Instruction text above the QR overlay
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.align(Alignment.Center)
-            )
+            ) {
+                Box(
+                    modifier = Modifier
+                        .padding(bottom = 20.dp)
+                        .background(Color(0x88000000))
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                ) {
+                    Text(
+                        text = "Point your camera at a QR code",
+                        color = Color.White,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Medium,
+                        textAlign = TextAlign.Center
+                    )
+                }
+
+                QROverlay(
+                    modifier = Modifier
+                )
+            }
         }
     }
 }
