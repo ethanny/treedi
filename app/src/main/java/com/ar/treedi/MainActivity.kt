@@ -63,7 +63,7 @@ fun TreediNav() {
             }
         }
 
-        composable("location") {
+        composable("treeLocations") {
             TreeLocations(navController) // pass navController down
         }
 

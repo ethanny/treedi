@@ -167,6 +167,6 @@ fun findSection (navController: NavController
 
         Spacer(Modifier.height(20.dp))
 
-        ActionButton("View tree locations", Lucide.MapPin, {navController.navigate("locations")})
+        ActionButton("View tree locations", Lucide.MapPin, {navController.navigate("treeLocations")})
     }
 }
