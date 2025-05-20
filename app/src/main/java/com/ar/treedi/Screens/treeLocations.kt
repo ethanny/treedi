@@ -15,6 +15,9 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.ui.Alignment
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -38,6 +41,7 @@ import com.ar.treedi.ui.theme.AppTypography.b1
 import com.ar.treedi.ui.theme.AppTypography.b2
 import com.ar.treedi.ui.theme.AppTypography.h2
 import com.ar.treedi.Components.NavButton
+import com.ar.treedi.ui.theme.AppTypography.h3
 
 data class TreeLocation(
     val location: String,
@@ -63,7 +67,8 @@ fun TreeLocations(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(color = Color(0xFFB8D1CA))
-                    .padding(start = 20.dp, top = 40.dp, end = 20.dp, bottom = 20.dp),
+                    .windowInsetsPadding(WindowInsets.statusBars)
+                    .padding(start = 20.dp, end = 20.dp, bottom = 20.dp),
                 verticalArrangement = Arrangement.spacedBy(10.dp, Alignment.Top),
                 horizontalAlignment = Alignment.Start
             ) {
@@ -108,13 +113,13 @@ fun TreeLocationItem(treeLocation: TreeLocation) {
     ) {
         Text(
             text = treeLocation.location,
-            style = b2,
+            style = h3,
             color = primaryGreen,
         )
         Spacer(modifier = Modifier.height(5.dp))
         Text(
             text = treeLocation.treeName,
-            style = b1,
+            style = b2,
             color = Color.Black
         )
     }

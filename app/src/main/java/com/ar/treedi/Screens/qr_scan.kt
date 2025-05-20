@@ -12,6 +12,7 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -36,12 +37,22 @@ import com.google.mlkit.vision.common.InputImage
 
 import com.ar.treedi.network.fetchTreeData
 import androidx.navigation.NavController
+import com.ar.treedi.ui.theme.accentGreen
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.launch
 
 @androidx.annotation.OptIn(ExperimentalGetImage::class)
 @Composable
-
 fun QRScanScreen(navController: NavController, onBackPressed: () -> Unit) {
+    val systemUiController = rememberSystemUiController()
+
+    DisposableEffect(systemUiController) {
+        systemUiController.setStatusBarColor(
+            color = Color.Transparent
+        )
+        onDispose {}
+    }
+
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val coroutineScope = rememberCoroutineScope()
@@ -88,159 +99,165 @@ fun QRScanScreen(navController: NavController, onBackPressed: () -> Unit) {
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        if (hasCameraPermission) {
-            AndroidView(
-                factory = { ctx ->
-                    val previewView = PreviewView(ctx).apply {
-                        implementationMode = PreviewView.ImplementationMode.COMPATIBLE
-                        scaleType = PreviewView.ScaleType.FILL_CENTER
-                    }
+    Scaffold { paddingValues ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+        ) {
+            if (hasCameraPermission) {
+                AndroidView(
+                    factory = { ctx ->
+                        val previewView = PreviewView(ctx).apply {
+                            implementationMode = PreviewView.ImplementationMode.COMPATIBLE
+                            scaleType = PreviewView.ScaleType.FILL_CENTER
+                        }
 
-                    val cameraProviderFuture = ProcessCameraProvider.getInstance(ctx)
+                        val cameraProviderFuture = ProcessCameraProvider.getInstance(ctx)
 
-                    cameraProviderFuture.addListener({
-                        try {
-                            val cameraProvider = cameraProviderFuture.get()
+                        cameraProviderFuture.addListener({
+                            try {
+                                val cameraProvider = cameraProviderFuture.get()
 
-                            // Unbind any previous use cases
-                            cameraProvider.unbindAll()
+                                // Unbind any previous use cases
+                                cameraProvider.unbindAll()
 
-                            val preview = Preview.Builder()
-                                .build()
-                                .also {
-                                    it.setSurfaceProvider(previewView.surfaceProvider)
-                                }
+                                val preview = Preview.Builder()
+                                    .build()
+                                    .also {
+                                        it.setSurfaceProvider(previewView.surfaceProvider)
+                                    }
 
-                            val barcodeScanner = BarcodeScanning.getClient()
+                                val barcodeScanner = BarcodeScanning.getClient()
 
-                            val imageAnalysis = ImageAnalysis.Builder()
-                                .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
-                                .build()
+                                val imageAnalysis = ImageAnalysis.Builder()
+                                    .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+                                    .build()
 
-                            imageAnalysis.setAnalyzer(
-                                ContextCompat.getMainExecutor(ctx)
-                            ) { imageProxy ->
-                                val mediaImage = imageProxy.image
-                                if (mediaImage != null) {
-                                    val image = InputImage.fromMediaImage(
-                                        mediaImage,
-                                        imageProxy.imageInfo.rotationDegrees
-                                    )
+                                imageAnalysis.setAnalyzer(
+                                    ContextCompat.getMainExecutor(ctx)
+                                ) { imageProxy ->
+                                    val mediaImage = imageProxy.image
+                                    if (mediaImage != null) {
+                                        val image = InputImage.fromMediaImage(
+                                            mediaImage,
+                                            imageProxy.imageInfo.rotationDegrees
+                                        )
 
-                                    barcodeScanner.process(image)
-                                        .addOnSuccessListener { barcodes ->
-                                            for (barcode in barcodes) {
-                                                if (barcode.valueType == Barcode.TYPE_URL ||
-                                                    barcode.valueType == Barcode.TYPE_TEXT) {
-                                                    barcode.rawValue?.let { code ->
-                                                        handleQrCode(code)
+                                        barcodeScanner.process(image)
+                                            .addOnSuccessListener { barcodes ->
+                                                for (barcode in barcodes) {
+                                                    if (barcode.valueType == Barcode.TYPE_URL ||
+                                                        barcode.valueType == Barcode.TYPE_TEXT) {
+                                                        barcode.rawValue?.let { code ->
+                                                            handleQrCode(code)
+                                                        }
                                                     }
                                                 }
                                             }
-                                        }
-                                        .addOnFailureListener { e ->
-                                            Log.e("QRScanScreen", "Barcode scanning failed", e)
-                                        }
-                                        .addOnCompleteListener {
-                                            imageProxy.close()
-                                        }
-                                } else {
-                                    imageProxy.close()
+                                            .addOnFailureListener { e ->
+                                                Log.e("QRScanScreen", "Barcode scanning failed", e)
+                                            }
+                                            .addOnCompleteListener {
+                                                imageProxy.close()
+                                            }
+                                    } else {
+                                        imageProxy.close()
+                                    }
                                 }
-                            }
 
-                            try {
-                                // Select back camera
-                                val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
+                                try {
+                                    // Select back camera
+                                    val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
 
-                                // Bind use cases to camera
-                                cameraProvider.bindToLifecycle(
-                                    lifecycleOwner,
-                                    cameraSelector,
-                                    preview,
-                                    imageAnalysis
-                                )
+                                    // Bind use cases to camera
+                                    cameraProvider.bindToLifecycle(
+                                        lifecycleOwner,
+                                        cameraSelector,
+                                        preview,
+                                        imageAnalysis
+                                    )
 
-                                Log.d("QRScanScreen", "Camera setup successful")
+                                    Log.d("QRScanScreen", "Camera setup successful")
+                                } catch (e: Exception) {
+                                    Log.e("QRScanScreen", "Camera binding failed", e)
+                                    cameraError = "Failed to bind camera: ${e.message}"
+                                }
                             } catch (e: Exception) {
-                                Log.e("QRScanScreen", "Camera binding failed", e)
-                                cameraError = "Failed to bind camera: ${e.message}"
+                                Log.e("QRScanScreen", "Camera provider error", e)
+                                cameraError = "Camera error: ${e.message}"
                             }
-                        } catch (e: Exception) {
-                            Log.e("QRScanScreen", "Camera provider error", e)
-                            cameraError = "Camera error: ${e.message}"
-                        }
-                    }, ContextCompat.getMainExecutor(ctx))
+                        }, ContextCompat.getMainExecutor(ctx))
 
-                    previewView
-                },
-                modifier = Modifier.fillMaxSize()
-            )
-        } else {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "Camera permission required",
-                    color = Color.White,
-                    textAlign = TextAlign.Center
+                        previewView
+                    },
+                    modifier = Modifier.fillMaxSize()
                 )
-            }
-        }
-
-        // Error message
-        cameraError?.let {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-                    .align(Alignment.TopCenter)
-                    .background(Color(0x88000000)),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = it,
-                    color = Color.White,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(8.dp)
-                )
-            }
-        }
-
-        BackButton(
-            icon = Lucide.ArrowLeft,
-            onClick = onBackPressed,
-            modifier = Modifier
-                .align(Alignment.TopStart)
-                .padding(16.dp)
-        )
-
-        if (showOverlay) {
-            // Instruction text above the QR overlay
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.align(Alignment.Center)
-            ) {
+            } else {
                 Box(
-                    modifier = Modifier
-                        .padding(bottom = 20.dp)
-                        .background(Color(0x88000000))
-                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = "Point your camera at a QR code",
+                        text = "Camera permission required",
                         color = Color.White,
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Medium,
                         textAlign = TextAlign.Center
                     )
                 }
+            }
 
-                QROverlay(
+            // Error message
+            cameraError?.let {
+                Box(
                     modifier = Modifier
-                )
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                        .align(Alignment.TopCenter)
+                        .background(Color(0x88000000)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = it,
+                        color = Color.White,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(8.dp)
+                    )
+                }
+            }
+
+            BackButton(
+                icon = Lucide.ArrowLeft,
+                onClick = onBackPressed,
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .padding(16.dp)
+            )
+
+            if (showOverlay) {
+                // Instruction text above the QR overlay
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.align(Alignment.Center)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .padding(bottom = 20.dp)
+                            .background(Color(0x88000000))
+                            .padding(horizontal = 16.dp, vertical = 8.dp)
+                    ) {
+                        Text(
+                            text = "Point your camera at a QR code",
+                            color = Color.White,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Medium,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+
+                    QROverlay(
+                        modifier = Modifier
+                    )
+                }
             }
         }
     }
