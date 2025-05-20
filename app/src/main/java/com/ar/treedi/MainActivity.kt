@@ -46,7 +46,8 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
 fun TreediNav() {
     val navController = rememberNavController()
 
-    NavHost(navController = navController, startDestination = "home") {
+    NavHost(navController = navController, startDestination = "home",
+        ) {
         composable("home") {
             Home(navController) // pass navController down
         }
