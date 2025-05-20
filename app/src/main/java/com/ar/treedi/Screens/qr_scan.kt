@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ar.treedi.Components.BackButton
 import com.ar.treedi.Components.QROverlay
 import com.composables.icons.lucide.ArrowLeft
@@ -36,12 +37,13 @@ import com.google.mlkit.vision.common.InputImage
 
 import com.ar.treedi.network.fetchTreeData
 import androidx.navigation.NavController
+import com.ar.treedi.ui.theme.SharedViewModel
 import kotlinx.coroutines.launch
 
 @androidx.annotation.OptIn(ExperimentalGetImage::class)
 @Composable
 
-fun QRScanScreen(navController: NavController, onBackPressed: () -> Unit) {
+fun QRScanScreen(navController: NavController, sharedViewModel: SharedViewModel, onBackPressed: () -> Unit) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val coroutineScope = rememberCoroutineScope()
@@ -78,11 +80,13 @@ fun QRScanScreen(navController: NavController, onBackPressed: () -> Unit) {
         coroutineScope.launch {
             try {
                 val treeData = fetchTreeData(code)
+                Log.d("TreeData", treeData.toString())
 
-                navController.currentBackStackEntry?.savedStateHandle?.set("treeData", treeData)
+                sharedViewModel.treeData = treeData
                 navController.navigate("treeDetail")
             } catch (e: Exception) {
-                Log.e("QRScanScreen", "Error fetching tree data", e)
+                Log.e("QRScanScreen", "Exception: ${e.javaClass.simpleName} - ${e.message}", e)
+            } finally {
                 isFetching = false
             }
         }

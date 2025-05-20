@@ -1,5 +1,9 @@
 package com.ar.treedi.models
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
+@Parcelize
 data class TreeData(
     val nativeName: String,
     val scientificName: String,
@@ -13,4 +17,4 @@ data class TreeData(
     val habitatType: String,
     val endemicity: String,
     val uses: String
-)
+) : Parcelable
