@@ -5,6 +5,6 @@ import retrofit2.http.GET
 import retrofit2.http.Path
 
 interface TreeService {
-    @GET("trees/{qr_code}/")
+    @GET("api/trees/qr/{qr_code}/")
     suspend fun getTreeData(@Path("qr_code") qrCode: String): TreeData
 }
