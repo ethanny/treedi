@@ -22,9 +22,16 @@ import com.ar.treedi.Screens.TreeDetails
 import com.ar.treedi.Screens.TreeLocations
 import com.ar.treedi.ui.theme.AppTypography.h1
 import com.ar.treedi.ui.theme.TreediTheme
-
 import com.ar.treedi.models.TreeData
 import com.ar.treedi.ui.theme.SharedViewModel
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -51,9 +58,30 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
 fun TreediNav(sharedViewModel: SharedViewModel) {
     val navController = rememberNavController()
 
-    NavHost(navController = navController, startDestination = "home") {
+    NavHost(
+        navController = navController,
+        startDestination = "home",
+        enterTransition = {
+            slideInHorizontally(
+                initialOffsetX = { fullWidth -> fullWidth },
+                animationSpec = tween(300)
+            )
+        },
+        exitTransition = {
+            fadeOut(animationSpec = tween(300))
+        },
+        popEnterTransition = {
+            EnterTransition.None
+        },
+        popExitTransition = {
+            slideOutHorizontally(
+                targetOffsetX = { fullWidth -> fullWidth },
+                animationSpec = tween(300)
+            )
+        }
+    ) {
         composable("home") {
-            Home(navController) // pass navController down
+            Home(navController)
         }
 
         composable("treeDetail") {
@@ -64,12 +92,13 @@ fun TreediNav(sharedViewModel: SharedViewModel) {
             if (treeData != null) {
                 TreeDetails(navController, treeData)
             } else {
-                Text("No tree data found.") // Fallback UI
+                Text("No tree data found.")
             }
         }
 
-        composable("treeLocations") {
-            TreeLocations(navController) // pass navController down
+        composable("treeLocations",
+        ) {
+            TreeLocations(navController)
         }
 
         composable("qr_scan") {
