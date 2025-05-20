@@ -1,6 +1,7 @@
 package com.ar.treedi
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -11,6 +12,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -20,13 +22,25 @@ import com.ar.treedi.Screens.TreeDetails
 import com.ar.treedi.Screens.TreeLocations
 import com.ar.treedi.ui.theme.AppTypography.h1
 import com.ar.treedi.ui.theme.TreediTheme
+import com.ar.treedi.models.TreeData
+import com.ar.treedi.ui.theme.SharedViewModel
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
         setContent {
-            TreediNav()
+            val sharedViewModel: SharedViewModel = viewModel()
+            TreediNav(sharedViewModel)
         }
     }
 }
@@ -41,25 +55,55 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun TreediNav() {
+fun TreediNav(sharedViewModel: SharedViewModel) {
     val navController = rememberNavController()
 
-    NavHost(navController = navController, startDestination = "home") {
+    NavHost(
+        navController = navController,
+        startDestination = "home",
+        enterTransition = {
+            slideInHorizontally(
+                initialOffsetX = { fullWidth -> fullWidth },
+                animationSpec = tween(300)
+            )
+        },
+        exitTransition = {
+            fadeOut(animationSpec = tween(300))
+        },
+        popEnterTransition = {
+            EnterTransition.None
+        },
+        popExitTransition = {
+            slideOutHorizontally(
+                targetOffsetX = { fullWidth -> fullWidth },
+                animationSpec = tween(300)
+            )
+        }
+    ) {
         composable("home") {
-            Home(navController) // pass navController down
+            Home(navController)
         }
 
-        composable("details") {
-            TreeDetails(navController) // pass navController down
+        composable("treeDetail") {
+            val treeData = sharedViewModel.treeData
+
+            Log.d("TreeDataMainAcitivty", treeData.toString())
+
+            if (treeData != null) {
+                TreeDetails(navController, treeData)
+            } else {
+                Text("No tree data found.")
+            }
         }
 
-        composable("locations") {
-            TreeLocations(navController) // pass navController down
+        composable("treeLocations",
+        ) {
+            TreeLocations(navController)
         }
 
         composable("qr_scan") {
-            QRScanScreen(onCodeScanned = { /* handle result */ }) {
-                navController.popBackStack() // for back button
+            QRScanScreen(navController = navController, sharedViewModel = sharedViewModel) {
+                navController.popBackStack()
             }
         }
     }

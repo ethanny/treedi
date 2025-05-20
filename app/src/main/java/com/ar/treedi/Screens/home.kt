@@ -16,12 +16,15 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -41,11 +44,20 @@ import com.composables.icons.lucide.Move3d
 import com.composables.icons.lucide.ScanBarcode
 import com.composables.icons.lucide.ScanLine
 import com.composables.icons.lucide.ZoomIn
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 
 @Composable
 fun Home(navController: NavController){
     val scrollState = rememberScrollState()
+    val systemUiController = rememberSystemUiController()
+    
+    DisposableEffect(systemUiController) {
+        systemUiController.setStatusBarColor(
+            color = accentGreen
+        )
+        onDispose {}
+    }
 
     Scaffold(
         containerColor = Color.White,
@@ -78,14 +90,14 @@ fun Home(navController: NavController){
                     Spacer(Modifier.height(10.dp))
 
                     Text(
-                        text = "Get to know UP Cebu’s Trees in 3D!",
+                        text = "Get to know UP Cebu's Trees in 3D!",
                         style = h3
                     )
 
                     Spacer(Modifier.height(20.dp))
 
                     ActionButton("Start scanning", icon = Lucide.ScanLine, {
-                        navController.navigate("details")
+                        navController.navigate("treeDetail")
                     })
                 }
 
@@ -96,10 +108,10 @@ fun Home(navController: NavController){
                         .padding(20.dp)
                 ) {
                     findSection(navController)
-                    section(Lucide.ScanBarcode, "Scan", "Scan the code on the tree using your phone’s camera.", R.drawable.hand_scan)
+                    section(Lucide.ScanBarcode, "Scan", "Scan the code on the tree using your phone's camera.", R.drawable.hand_scan)
                     section(Lucide.Move3d, "Interact", "Get up close with a lifelike 3D tree model. Rotate, zoom, and \n" +
                             "explore every detail.", R.drawable.interact)
-                    section(Lucide.BookOpenText, "Learn", "Learn all about the tree’s unique features, its ecological background, and uses.", R.drawable.learn)
+                    section(Lucide.BookOpenText, "Learn", "Learn all about the tree's unique features, its ecological background, and uses.", R.drawable.learn)
 
                     ActionButton("I'm ready to scan", icon = Lucide.ScanLine, {
                         navController.navigate("qr_scan")
@@ -167,6 +179,6 @@ fun findSection (navController: NavController
 
         Spacer(Modifier.height(20.dp))
 
-        ActionButton("View tree locations", Lucide.MapPin, {navController.navigate("locations")})
+        ActionButton("View tree locations", Lucide.MapPin, {navController.navigate("treeLocations")})
     }
 }
