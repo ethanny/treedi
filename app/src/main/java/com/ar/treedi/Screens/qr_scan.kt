@@ -11,15 +11,12 @@ import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
@@ -29,6 +26,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.ar.treedi.Components.BackButton
 import com.ar.treedi.Components.QROverlay
 import com.composables.icons.lucide.ArrowLeft
 import kotlinx.coroutines.delay
@@ -39,29 +38,26 @@ import com.google.mlkit.vision.common.InputImage
 
 import com.ar.treedi.network.fetchTreeData
 import androidx.navigation.NavController
-import com.ar.treedi.Components.IconButton
-import com.ar.treedi.ui.theme.AppTypography.b1
-import com.ar.treedi.ui.theme.AppTypography.b2
-import com.ar.treedi.ui.theme.AppTypography.b3
-import com.ar.treedi.ui.theme.AppTypography.h3
+import com.ar.treedi.ui.theme.SharedViewModel
 import com.ar.treedi.ui.theme.accentGreen
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.launch
 
 @androidx.annotation.OptIn(ExperimentalGetImage::class)
 @Composable
-fun QRScanScreen(navController: NavController, onBackPressed: () -> Unit) {
+
+fun QRScanScreen(navController: NavController, sharedViewModel: SharedViewModel, onBackPressed: () -> Unit) {
     val systemUiController = rememberSystemUiController()
 
     DisposableEffect(systemUiController) {
         systemUiController.setStatusBarColor(
-            color = Color.Black
+            color = Color.Transparent
         )
         onDispose {}
     }
 
     val context = LocalContext.current
-    val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
+    val lifecycleOwner = LocalLifecycleOwner.current
     val coroutineScope = rememberCoroutineScope()
 
     // Always show overlay
@@ -96,11 +92,13 @@ fun QRScanScreen(navController: NavController, onBackPressed: () -> Unit) {
         coroutineScope.launch {
             try {
                 val treeData = fetchTreeData(code)
+                Log.d("TreeData", treeData.toString())
 
-                navController.currentBackStackEntry?.savedStateHandle?.set("treeData", treeData)
+                sharedViewModel.treeData = treeData
                 navController.navigate("treeDetail")
             } catch (e: Exception) {
-                Log.e("QRScanScreen", "Error fetching tree data", e)
+                Log.e("QRScanScreen", "Exception: ${e.javaClass.simpleName} - ${e.message}", e)
+            } finally {
                 isFetching = false
             }
         }
@@ -207,7 +205,7 @@ fun QRScanScreen(navController: NavController, onBackPressed: () -> Unit) {
                 ) {
                     Text(
                         text = "Camera permission required",
-                        style = h3.copy(color = Color.White),
+                        color = Color.White,
                         textAlign = TextAlign.Center
                     )
                 }
@@ -225,45 +223,39 @@ fun QRScanScreen(navController: NavController, onBackPressed: () -> Unit) {
                 ) {
                     Text(
                         text = it,
-                        style = h3.copy(color = Color.White),
+                        color = Color.White,
                         textAlign = TextAlign.Center,
                         modifier = Modifier.padding(8.dp)
                     )
                 }
             }
 
-            Box(
-                modifier = Modifier.padding(vertical = 10.dp, horizontal = 20.dp)
-            ) {
-                IconButton(
-                    Lucide.ArrowLeft,
-                    { navController.popBackStack() },
-                    bgColor = Color.White.copy(alpha = 0.5f),
-                    iconColor = Color.White
-                )
-            }
+            BackButton(
+                icon = Lucide.ArrowLeft,
+                onClick = onBackPressed,
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .padding(16.dp)
+            )
 
             if (showOverlay) {
                 // Instruction text above the QR overlay
                 Column(
-                    verticalArrangement = Arrangement.spacedBy(10.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.align(Alignment.Center),
+                    modifier = Modifier.align(Alignment.Center)
                 ) {
                     Box(
                         modifier = Modifier
-                            .width(250.dp)
-                            .clip(RoundedCornerShape(16.dp))
-                            .background(Color.White.copy(alpha = 0.25f))
-                            .border(
-                                width = 2.dp,
-                                color = Color.White,
-                                shape = RoundedCornerShape(50.dp)
-                            )
+                            .padding(bottom = 20.dp)
+                            .background(Color(0x88000000))
                             .padding(horizontal = 16.dp, vertical = 8.dp)
-
                     ) {
-                        Text("Point your camera at a QR code",modifier = Modifier.fillMaxWidth(), style = b2.copy(color = Color.White, textAlign = TextAlign.Center)
+                        Text(
+                            text = "Point your camera at a QR code",
+                            color = Color.White,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Medium,
+                            textAlign = TextAlign.Center
                         )
                     }
 

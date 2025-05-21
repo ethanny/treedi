@@ -1,6 +1,6 @@
 package com.ar.treedi.network
 
-import androidx.media3.common.util.Log
+import android.util.Log
 import com.ar.treedi.models.TreeData
 
 suspend fun fetchTreeData(qrCode: String): TreeData {
