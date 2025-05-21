@@ -3,13 +3,17 @@ package com.ar.treedi.Screens
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -51,7 +55,7 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 fun Home(navController: NavController){
     val scrollState = rememberScrollState()
     val systemUiController = rememberSystemUiController()
-    
+
     DisposableEffect(systemUiController) {
         systemUiController.setStatusBarColor(
             color = accentGreen
@@ -60,6 +64,9 @@ fun Home(navController: NavController){
     }
 
     Scaffold(
+        topBar = {
+            Box(modifier = Modifier.background(accentGreen)) {  }
+        },
         containerColor = Color.White,
         content = { paddingValues ->
             Column(
@@ -73,6 +80,7 @@ fun Home(navController: NavController){
                         .fillMaxWidth()
                         .background(color = accentGreen)
                         .padding(20.dp)
+                        .windowInsetsPadding(WindowInsets.statusBars)
                 ) {
                     Image(
                         painter = painterResource(id = R.drawable.treedi_logo),

@@ -13,6 +13,9 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -30,23 +33,34 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
@@ -74,6 +88,7 @@ import com.composables.icons.lucide.Lucide
 import com.composables.icons.lucide.MapPinHouse
 import com.composables.icons.lucide.ScanEye
 import com.composables.icons.lucide.Trees
+import com.composables.icons.lucide.X
 
 import com.ar.treedi.models.TreeData
 import com.composables.icons.lucide.Cuboid
@@ -95,7 +110,7 @@ import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
 
 @Composable
-fun TreeDetails(navController: NavController, treeData: TreeData) {
+fun TreeDetails(navController: NavController, treeData: TreeData, isImageTapped: MutableState<Boolean>) {
     val systemUiController = rememberSystemUiController()
     val isFullImageMode = remember { mutableStateOf(false) }
 
@@ -121,176 +136,286 @@ fun TreeDetails(navController: NavController, treeData: TreeData) {
     }
 
 
-        Scaffold(
-            topBar = {
+    Scaffold(
+        topBar = {
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(color = accentGreen)
+                    .windowInsetsPadding(WindowInsets.statusBars)
+                    .padding(vertical = 10.dp, horizontal = 20.dp),
+            ) {
+                IconButton(Lucide.ArrowLeft, { navController.popBackStack() })
+                
                 Row(
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(color = accentGreen)
-                        .windowInsetsPadding(WindowInsets.statusBars)
-                        .padding(vertical = 10.dp, horizontal = 20.dp),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
                 ) {
-                    IconButton(Lucide.ArrowLeft, { navController.popBackStack() })
-                    
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(10.dp),
-                    ) {
-                        IconButton(Lucide.ScanEye, { isFullImageMode.value = !isFullImageMode.value })
-                    }
+                    IconButton(Lucide.ScanEye, { isFullImageMode.value = !isFullImageMode.value })
                 }
-            },
-            containerColor = Color.White,
-            content = { paddingValues ->
+            }
+        },
+        containerColor = Color.White,
+        content = { paddingValues ->
+            Column(
+                modifier = Modifier
+                    .padding(paddingValues)
+                    .background(Color.White)
+                    .then(
+                        if (!isFullImageMode.value) {
+                            Modifier.verticalScroll(scrollState)
+                        } else {
+                            Modifier
+                        }
+                    )
+            ) {
                 Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier
-                        .padding(paddingValues)
-                        .background(Color.White)
+                        .background(color = accentGreen)
+                        .animateContentSize()
                         .then(
-                            if (!isFullImageMode.value) {
-                                Modifier.verticalScroll(scrollState)
+                            if (isFullImageMode.value) {
+                                Modifier.fillMaxHeight()
                             } else {
                                 Modifier
+                                    .height(200.dp)
                             }
                         )
                 ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier
-                            .background(color = accentGreen)
-                            .animateContentSize()
-                            .then(
-                                if (isFullImageMode.value) {
-                                    Modifier.fillMaxHeight()
-                                } else {
-                                    Modifier
-                                        .height(200.dp)
-                                }
-                            )
-                    ) {
-                        if(isFullImageMode.value) {
-                            Text("Rotate, pinch to zoom in or out to explore tree details",
-                                style = h2.copy(color = primaryGreen, textAlign = TextAlign.Center),
-                                modifier = Modifier.padding(20.dp),
+                    if(isFullImageMode.value) {
+                        Text("Rotate, pinch to zoom in or out to explore tree details",
+                            style = h2.copy(color = primaryGreen, textAlign = TextAlign.Center),
+                            modifier = Modifier.padding(20.dp),
 
-                            )
-                        }
-                        modelScene()
+                        )
                     }
+                    modelScene(isFullImageMode)
 
-                    AnimatedVisibility(
-                        visible = !isFullImageMode.value,
-                        enter = fadeIn() + expandVertically(),
-                        exit = fadeOut() + shrinkVertically()
-                    ) {
-                        Column {
-                            Column(
-                                verticalArrangement = Arrangement.spacedBy(5.dp),
-                                horizontalAlignment = Alignment.Start,
+                }
+
+                AnimatedVisibility(
+                    visible = !isFullImageMode.value,
+                    enter = fadeIn() + expandVertically(),
+                    exit = fadeOut() + shrinkVertically()
+                ) {
+                    Column {
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(5.dp),
+                            horizontalAlignment = Alignment.Start,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(20.dp)
+                        ) {
+                            Text(treeData.nativeName, style = h2.copy(color = primaryGreen))
+                            Text(treeData.scientificName, style = b1.copy(color = primaryGreen))
+
+                            Spacer(Modifier.height(20.dp))
+
+                            Text(treeData.description, style = b1)
+                            Text("Also known as: ${treeData.otherNames}", style = b1.copy(color = Color.Gray))
+                            Text("Family: ${treeData.family}", style = b1.copy(color = Color.Gray))
+                            Text("Genus: ${treeData.genus}", style = b1.copy(color = Color.Gray))
+
+                            Spacer(Modifier.height(20.dp))
+
+                            Text("Images", style = h2.copy(color = primaryGreen))
+
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(5.dp),
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(20.dp)
+                                    .horizontalScroll(rememberScrollState())
+
                             ) {
-                                Text(treeData.nativeName, style = h2.copy(color = primaryGreen))
-                                Text(treeData.scientificName, style = b1.copy(color = primaryGreen))
-
-                                Spacer(Modifier.height(20.dp))
-
-                                Text(treeData.description, style = b1)
-                                Text("Also known as: ${treeData.otherNames}", style = b1.copy(color = Color.Gray))
-                                Text("Family: ${treeData.family}", style = b1.copy(color = Color.Gray))
-                                Text("Genus: ${treeData.genus}", style = b1.copy(color = Color.Gray))
-
-                                Spacer(Modifier.height(20.dp))
-
-                                Text("Images", style = h2.copy(color = primaryGreen))
-
-                                Row(
-                                    horizontalArrangement = Arrangement.spacedBy(5.dp),
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .horizontalScroll(rememberScrollState())
-
-                                ) {
-                                    getImagesForId(treeData.nativeName).forEach { image ->
-                                        val width =  (LocalConfiguration.current.screenWidthDp.dp - 50.dp) / 3.dp
-                                        Box(
-                                            modifier = Modifier
-                                                .clip(RoundedCornerShape(5.dp))
-                                        ) {
-                                            Image(
-                                                modifier = Modifier.height(150.dp).width(width.dp),
-                                                painter = painterResource(id = image),
-                                                contentDescription = null,
-                                                contentScale = ContentScale.FillHeight,
-                                            )
-                                        }
+                                getImagesForId(treeData.nativeName).forEach { image ->
+                                    val width = (LocalConfiguration.current.screenWidthDp.dp - 50.dp) / 3.dp
+                                    Box(
+                                        modifier = Modifier
+                                            .clip(RoundedCornerShape(5.dp))
+                                            .clickable {
+                                                isImageTapped.value = true
+                                                navController.navigate("image_view/${image}")
+                                            }
+                                    ) {
+                                        Image(
+                                            modifier = Modifier.height(150.dp).width(width.dp),
+                                            painter = painterResource(id = image),
+                                            contentDescription = null,
+                                            contentScale = ContentScale.FillHeight,
+                                        )
                                     }
                                 }
                             }
+                        }
 
-                            Column(
-                                verticalArrangement = Arrangement.spacedBy(10.dp),
-                                horizontalAlignment = Alignment.Start,
-                                modifier = Modifier
-                                    .background(lightGray)
-                                    .fillMaxWidth()
-                                    .padding(20.dp)
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(10.dp),
+                            horizontalAlignment = Alignment.Start,
+                            modifier = Modifier
+                                .background(lightGray)
+                                .fillMaxWidth()
+                                .padding(20.dp)
+                        ) {
+                            Text("Ecological background", style = h2.copy(color = primaryGreen))
+
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.Start),
+                                verticalAlignment = Alignment.Top,
+                                modifier = Modifier.fillMaxWidth()
                             ) {
-                                Text("Ecological background", style = h2.copy(color = primaryGreen))
-
-                                Row(
-                                    horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.Start),
-                                    verticalAlignment = Alignment.Top,
-                                    modifier = Modifier.fillMaxWidth()
-                                ) {
-                                    EcologicalCard(
-                                        icon = Lucide.MapPinHouse,
-                                        iconColor = red,
-                                        title = "Native Location",
-                                        description = treeData.nativeLocation,
-                                        modifier = Modifier.weight(1f)
-                                    )
-                                    EcologicalCard(
-                                        icon = Lucide.MapPinHouse,
-                                        iconColor = yellow,
-                                        title = "Climate",
-                                        description = treeData.climate,
-                                        modifier = Modifier.weight(1f)
-                                    )
-                                }
-
-                                Row(
-                                    horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.Start),
-                                    verticalAlignment = Alignment.Top,
-                                    modifier = Modifier.fillMaxWidth()
-                                ) {
-                                    EcologicalCard(Lucide.Earth, brown, "Systemic", treeData.system, modifier = Modifier.weight(1f))
-                                    EcologicalCard(Lucide.Trees, primaryGreen, "Habitat Type", treeData.habitatType, modifier = Modifier.weight(1f))
-                                }
-                                EcologicalCard(Lucide.Leaf, primaryGreen, "Endemicity", treeData.endemicity, modifier = Modifier.fillMaxWidth())
+                                EcologicalCard(
+                                    icon = Lucide.MapPinHouse,
+                                    iconColor = red,
+                                    title = "Native Location",
+                                    description = treeData.nativeLocation,
+                                    modifier = Modifier.weight(1f)
+                                )
+                                EcologicalCard(
+                                    icon = Lucide.MapPinHouse,
+                                    iconColor = yellow,
+                                    title = "Climate",
+                                    description = treeData.climate,
+                                    modifier = Modifier.weight(1f)
+                                )
                             }
 
-                            Column(
-                                verticalArrangement = Arrangement.spacedBy(10.dp),
-                                horizontalAlignment = Alignment.Start,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(20.dp)
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.Start),
+                                verticalAlignment = Alignment.Top,
+                                modifier = Modifier.fillMaxWidth()
                             ) {
-                                Text("Uses", style = h2.copy(color = primaryGreen))
-                                Text(treeData.uses, style = b1)
+                                EcologicalCard(Lucide.Earth, brown, "Systemic", treeData.system, modifier = Modifier.weight(1f))
+                                EcologicalCard(Lucide.Trees, primaryGreen, "Habitat Type", treeData.habitatType, modifier = Modifier.weight(1f))
                             }
+                            EcologicalCard(Lucide.Leaf, primaryGreen, "Endemicity", treeData.endemicity, modifier = Modifier.fillMaxWidth())
+                        }
+
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(10.dp),
+                            horizontalAlignment = Alignment.Start,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(20.dp)
+                        ) {
+                            Text("Uses", style = h2.copy(color = primaryGreen))
+                            Text(treeData.uses, style = b1)
                         }
                     }
                 }
             }
-        )
-
+        }
+    )
 }
 
 @Composable
-fun modelScene(){
+fun ZoomableImageScreen(navController: NavController, imageResourceId: Int, isImageTapped: MutableState<Boolean>) {
+    val systemUiController = rememberSystemUiController()
+    var scale by remember { mutableFloatStateOf(1f) }
+    var offset by remember { mutableStateOf(Offset.Zero) }
+    val minScale = 1f
+    val maxScale = 3f
+    
+    DisposableEffect(systemUiController) {
+        systemUiController.setStatusBarColor(color = Color.Black)
+        onDispose {
+            isImageTapped.value = false
+            systemUiController.setStatusBarColor(color = accentGreen)
+        }
+    }
+
+    Scaffold(
+        topBar = {
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color.Black)
+                    .windowInsetsPadding(WindowInsets.statusBars)
+                    .padding(vertical = 10.dp, horizontal = 16.dp)
+            ) {
+                IconButton(
+                    icon = Lucide.ArrowLeft,
+                    onClick = { navController.popBackStack() },
+                    modifier = Modifier
+                )
+                
+                // Title can be added here if needed
+            }
+        },
+        containerColor = Color.Black,
+        content = { paddingValues ->
+            Box(
+                modifier = Modifier
+                    .padding(paddingValues)
+                    .fillMaxSize()
+                    .background(Color.Black)
+                    .pointerInput(Unit) {
+                        detectTapGestures(
+                            onDoubleTap = { tapOffset ->
+                                scale = if (scale > minScale * 1.2f) minScale else maxScale
+                                offset = if (scale <= minScale * 1.2f) Offset.Zero else {
+                                    // Center the zoom on the tap location
+                                    val centeredOffset = Offset(
+                                        (size.width / 2 - tapOffset.x) * (scale - 1),
+                                        (size.height / 2 - tapOffset.y) * (scale - 1)
+                                    )
+                                    // Manually constrain the offset within bounds
+                                    val maxX = size.width * (scale - 1)
+                                    val maxY = size.height * (scale - 1)
+                                    Offset(
+                                        centeredOffset.x.coerceIn(-maxX, maxX),
+                                        centeredOffset.y.coerceIn(-maxY, maxY)
+                                    )
+                                }
+                            }
+                        )
+                    }
+            ) {
+                Image(
+                    painter = painterResource(id = imageResourceId),
+                    contentDescription = null,
+                    contentScale = ContentScale.Fit,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .graphicsLayer(
+                            scaleX = scale,
+                            scaleY = scale,
+                            translationX = offset.x,
+                            translationY = offset.y
+                        )
+                        .pointerInput(Unit) {
+                            detectTransformGestures { _, pan, zoom, _ ->
+                                scale = (scale * zoom).coerceIn(minScale, maxScale)
+                                
+                                // Only allow panning when zoomed in
+                                if (scale > 1f) {
+                                    val maxX = size.width * (scale - 1) / 2
+                                    val maxY = size.height * (scale - 1) / 2
+                                    
+                                    val newOffset = Offset(
+                                        offset.x + pan.x * scale,
+                                        offset.y + pan.y * scale
+                                    )
+                                    
+                                    offset = Offset(
+                                        newOffset.x.coerceIn(-maxX, maxX),
+                                        newOffset.y.coerceIn(-maxY, maxY)
+                                    )
+                                } else {
+                                    offset = Offset.Zero
+                                }
+                            }
+                        }
+                )
+            }
+        }
+    )
+}
+
+@Composable
+fun modelScene(isFullImageMode: MutableState<Boolean>){
     Box(modifier = Modifier.fillMaxSize()) {
         val engine = rememberEngine()
         val modelLoader = rememberModelLoader(engine)
@@ -305,7 +430,8 @@ fun modelScene(){
         val cameraTransition = rememberInfiniteTransition(label = "CameraTransition")
         val cameraRotation by cameraTransition.animateRotation(
             initialValue = Rotation(y = 0.0f),
-            targetValue = Rotation(y = 360.0f),
+            targetValue = Rotation(y = if (isFullImageMode.value) 0.0f else 360.0f),
+
             animationSpec = infiniteRepeatable(
                 animation = tween(durationMillis = 7.seconds.toInt(DurationUnit.MILLISECONDS))
             )
@@ -377,11 +503,12 @@ fun EcologicalCard(
 @Preview(showBackground = true)
 @Composable
 fun TreeDetailScreenPreview() {
+    val isImageTapped = remember { mutableStateOf(false) }
     val navController = rememberNavController()
     val treeData = TreeData("Flame tree", "Delonix regia", "", "", "", "", "","","","","", "")
     MaterialTheme {
         Surface {
-            TreeDetails(navController, treeData)
+            TreeDetails(navController, treeData, isImageTapped)
         }
     }
 }

@@ -16,9 +16,12 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
 import com.ar.treedi.Screens.Home
 import com.ar.treedi.Screens.QRScanScreen
 import com.ar.treedi.Screens.TreeDetails
+import com.ar.treedi.Screens.ZoomableImageScreen
 import com.ar.treedi.Screens.TreeLocations
 import com.ar.treedi.ui.theme.AppTypography.h1
 import com.ar.treedi.ui.theme.TreediTheme
@@ -32,6 +35,8 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import com.ar.treedi.Screens.NoTree
 
 class MainActivity : ComponentActivity() {
@@ -58,6 +63,7 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
 @Composable
 fun TreediNav(sharedViewModel: SharedViewModel) {
     val navController = rememberNavController()
+    val isImageTapped = remember { mutableStateOf(false) }
 
     NavHost(
         navController = navController,
@@ -92,7 +98,7 @@ fun TreediNav(sharedViewModel: SharedViewModel) {
             Log.d("TreeDataMainAcitivty", treeData.toString())
 
             if (treeData != null) {
-                TreeDetails(navController, treeData)
+                TreeDetails(navController, treeData, isImageTapped)
             } else {
                 NoTree(navController)
             }
@@ -101,6 +107,18 @@ fun TreediNav(sharedViewModel: SharedViewModel) {
         composable("treeLocations",
         ) {
             TreeLocations(navController)
+        }
+
+        composable(
+            enterTransition = { fadeIn(animationSpec = tween(300)) },
+            popExitTransition = {
+                fadeOut(animationSpec = tween(300))
+            },
+            route = "image_view/{imageId}",
+            arguments = listOf(navArgument("imageId") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val imageId = backStackEntry.arguments?.getInt("imageId") ?: 0
+            ZoomableImageScreen(navController, imageId, isImageTapped)
         }
 
         composable("qr_scan") {
