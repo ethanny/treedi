@@ -56,7 +56,7 @@ fun QRScanScreen(navController: NavController, sharedViewModel: SharedViewModel,
 
     DisposableEffect(systemUiController) {
         systemUiController.setStatusBarColor(
-            color = Color.Transparent
+            color = Color.Black
         )
         onDispose {}
     }
