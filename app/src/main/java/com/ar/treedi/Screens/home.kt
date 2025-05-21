@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
@@ -21,8 +22,14 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -47,12 +54,39 @@ import com.composables.icons.lucide.ScanBarcode
 import com.composables.icons.lucide.ScanLine
 import com.composables.icons.lucide.ZoomIn
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
-
+import androidx.compose.animation.core.*
+import kotlinx.coroutines.delay
 
 @Composable
 fun Home(navController: NavController){
     val scrollState = rememberScrollState()
     val systemUiController = rememberSystemUiController()
+    
+    // Animation states
+    var startAnimation by remember { mutableStateOf(false) }
+    val logoScale by animateFloatAsState(
+        targetValue = if (startAnimation) 1f else 0f,
+        animationSpec = tween(durationMillis = 500, easing = FastOutSlowInEasing),
+        label = "scaleAnimation"
+    )
+    
+    // Infinite floating animation
+    val infiniteTransition = rememberInfiniteTransition(label = "logoFloat")
+    val offsetY by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 5f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(1000, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "floatAnimation"
+    )
+    
+    // Entrance scale animation
+    LaunchedEffect(key1 = true) {
+        delay(300)
+        startAnimation = true
+    }
 
     DisposableEffect(systemUiController) {
         systemUiController.setStatusBarColor(
@@ -83,7 +117,9 @@ fun Home(navController: NavController){
                     Image(
                         painter = painterResource(id = R.drawable.treedi_logo),
                         modifier = Modifier
-                            .width(130.dp),
+                            .width(130.dp)
+                            .scale(logoScale)
+                            .offset(y = offsetY.dp),
                         contentDescription = "scan",
                         contentScale = ContentScale.FillWidth
                     )
