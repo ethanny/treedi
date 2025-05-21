@@ -32,6 +32,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
+import com.ar.treedi.Screens.NoTree
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -85,14 +86,15 @@ fun TreediNav(sharedViewModel: SharedViewModel) {
         }
 
         composable("treeDetail") {
-            val treeData = sharedViewModel.treeData
+            val treeData = TreeData("Kalachuchi", "", "", "", "", "", "","","","","", "")
+//            val treeData = sharedViewModel.treeData
 
             Log.d("TreeDataMainAcitivty", treeData.toString())
 
             if (treeData != null) {
                 TreeDetails(navController, treeData)
             } else {
-                Text("No tree data found.")
+                NoTree(navController)
             }
         }
 
