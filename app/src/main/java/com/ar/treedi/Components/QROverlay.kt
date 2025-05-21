@@ -20,7 +20,7 @@ fun QROverlay(modifier: Modifier = Modifier) {
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier
-            .size(220.dp)
+            .size(250.dp)
             .clip(RoundedCornerShape(16.dp))
             .background(Color.White.copy(alpha = 0.25f))
             .border(
@@ -30,10 +30,10 @@ fun QROverlay(modifier: Modifier = Modifier) {
             )
     ) {
         // QR Code Image inside
-        Image(
-            painter = painterResource(id = R.drawable.scan_overlay),
-            contentDescription = "QR Code",
-            modifier = Modifier.size(150.dp) // Adjust size as needed
-        )
+//        Image(
+//            painter = painterResource(id = R.drawable.scan_overlay),
+//            contentDescription = "QR Code",
+//            modifier = Modifier.size(150.dp) // Adjust size as needed
+//        )
     }
 }

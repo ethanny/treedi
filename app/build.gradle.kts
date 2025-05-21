@@ -29,11 +29,11 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = "11"
+        jvmTarget = "17"
     }
     buildFeatures {
         compose = true
@@ -61,6 +61,9 @@ dependencies {
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation("com.google.accompanist:accompanist-permissions:0.31.5-beta")
     implementation("com.google.accompanist:accompanist-systemuicontroller:0.31.5-beta")
+
+    implementation ("io.github.sceneview:arsceneview:2.3.0")
+    implementation("io.github.sceneview:sceneview:2.3.0")
     implementation(libs.androidx.media3.common.ktx)
 
     testImplementation(libs.junit)

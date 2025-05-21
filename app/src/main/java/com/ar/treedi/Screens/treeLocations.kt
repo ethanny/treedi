@@ -68,7 +68,7 @@ fun TreeLocations(
                     .fillMaxWidth()
                     .background(color = Color(0xFFB8D1CA))
                     .windowInsetsPadding(WindowInsets.statusBars)
-                    .padding(start = 20.dp, end = 20.dp, bottom = 20.dp),
+                    .padding(vertical = 10.dp, horizontal = 20.dp),
                 verticalArrangement = Arrangement.spacedBy(10.dp, Alignment.Top),
                 horizontalAlignment = Alignment.Start
             ) {

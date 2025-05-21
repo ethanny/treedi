@@ -11,12 +11,15 @@ import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
@@ -37,6 +40,11 @@ import com.google.mlkit.vision.common.InputImage
 
 import com.ar.treedi.network.fetchTreeData
 import androidx.navigation.NavController
+import com.ar.treedi.Components.IconButton
+import com.ar.treedi.ui.theme.AppTypography.b1
+import com.ar.treedi.ui.theme.AppTypography.b2
+import com.ar.treedi.ui.theme.AppTypography.b3
+import com.ar.treedi.ui.theme.AppTypography.h3
 import com.ar.treedi.ui.theme.accentGreen
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.launch
@@ -48,13 +56,13 @@ fun QRScanScreen(navController: NavController, onBackPressed: () -> Unit) {
 
     DisposableEffect(systemUiController) {
         systemUiController.setStatusBarColor(
-            color = Color.Transparent
+            color = Color.Black
         )
         onDispose {}
     }
 
     val context = LocalContext.current
-    val lifecycleOwner = LocalLifecycleOwner.current
+    val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
     val coroutineScope = rememberCoroutineScope()
 
     // Always show overlay
@@ -200,7 +208,7 @@ fun QRScanScreen(navController: NavController, onBackPressed: () -> Unit) {
                 ) {
                     Text(
                         text = "Camera permission required",
-                        color = Color.White,
+                        style = h3.copy(color = Color.White),
                         textAlign = TextAlign.Center
                     )
                 }
@@ -218,39 +226,45 @@ fun QRScanScreen(navController: NavController, onBackPressed: () -> Unit) {
                 ) {
                     Text(
                         text = it,
-                        color = Color.White,
+                        style = h3.copy(color = Color.White),
                         textAlign = TextAlign.Center,
                         modifier = Modifier.padding(8.dp)
                     )
                 }
             }
 
-            BackButton(
-                icon = Lucide.ArrowLeft,
-                onClick = onBackPressed,
-                modifier = Modifier
-                    .align(Alignment.TopStart)
-                    .padding(16.dp)
-            )
+            Box(
+                modifier = Modifier.padding(vertical = 10.dp, horizontal = 20.dp)
+            ) {
+                IconButton(
+                    Lucide.ArrowLeft,
+                    { navController.popBackStack() },
+                    bgColor = Color.White.copy(alpha = 0.5f),
+                    iconColor = Color.White
+                )
+            }
 
             if (showOverlay) {
                 // Instruction text above the QR overlay
                 Column(
+                    verticalArrangement = Arrangement.spacedBy(10.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.align(Alignment.Center)
+                    modifier = Modifier.align(Alignment.Center),
                 ) {
                     Box(
                         modifier = Modifier
-                            .padding(bottom = 20.dp)
-                            .background(Color(0x88000000))
+                            .width(250.dp)
+                            .clip(RoundedCornerShape(16.dp))
+                            .background(Color.White.copy(alpha = 0.25f))
+                            .border(
+                                width = 2.dp,
+                                color = Color.White,
+                                shape = RoundedCornerShape(50.dp)
+                            )
                             .padding(horizontal = 16.dp, vertical = 8.dp)
+
                     ) {
-                        Text(
-                            text = "Point your camera at a QR code",
-                            color = Color.White,
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Medium,
-                            textAlign = TextAlign.Center
+                        Text("Point your camera at a QR code",modifier = Modifier.fillMaxWidth(), style = b2.copy(color = Color.White, textAlign = TextAlign.Center)
                         )
                     }
 

@@ -1,5 +1,6 @@
 package com.ar.treedi.Components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -20,14 +21,17 @@ import com.composables.icons.lucide.Lucide
 fun IconButton(
     icon: ImageVector,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    bgColor: Color = Color(0x2600573F),
+    iconColor: Color = primaryGreen
 ) {
     Button(
         onClick = onClick,
         elevation = null,
         shape = RoundedCornerShape(50.dp),
+        border = BorderStroke(width = 1.25.dp, if (iconColor == Color.White) iconColor else Color.Transparent),
         colors = ButtonDefaults.buttonColors(
-            containerColor =  Color(0x2600573F),
+            containerColor =  bgColor,
             contentColor = Color.Unspecified
         ),
     ) {
@@ -36,7 +40,7 @@ fun IconButton(
             modifier = Modifier
                 .height(18.dp),
             contentDescription = "icon",
-            colorFilter = ColorFilter.tint(primaryGreen)
+            colorFilter = ColorFilter.tint(iconColor)
         )
     }
 }

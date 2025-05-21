@@ -80,7 +80,7 @@ fun TreediNav() {
         }
 
         composable("treeDetail") {
-            val treeData = TreeData("", "", "", "", "", "", "","","","","", "")
+            val treeData = TreeData("Kalachuchi", "", "", "", "", "", "","","","","", "")
 //            val treeData = navController.currentBackStackEntry
 //                ?.savedStateHandle
 //                ?.get<TreeData>("treeData")
