@@ -92,8 +92,8 @@ fun TreediNav(sharedViewModel: SharedViewModel) {
         }
 
         composable("treeDetail") {
-            val treeData = TreeData("Rain tree", "", "", "", "", "", "","","","","", "")
-//            val treeData = sharedViewModel.treeData
+//            val treeData = TreeData("Rain tree", "", "", "", "", "", "","","","","", "")
+            val treeData = sharedViewModel.treeData
 
             Log.d("TreeDataMainAcitivty", treeData.toString())
 
