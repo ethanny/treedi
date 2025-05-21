@@ -2,8 +2,6 @@ package com.ar.treedi.Screens
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
@@ -33,11 +31,8 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -52,12 +47,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
@@ -68,7 +61,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.media3.common.MediaItem
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.ar.treedi.Components.IconButton
@@ -88,17 +80,13 @@ import com.composables.icons.lucide.Lucide
 import com.composables.icons.lucide.MapPinHouse
 import com.composables.icons.lucide.ScanEye
 import com.composables.icons.lucide.Trees
-import com.composables.icons.lucide.X
 
 import com.ar.treedi.models.TreeData
-import com.composables.icons.lucide.Cuboid
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import io.github.sceneview.Scene
 import io.github.sceneview.animation.Transition.animateRotation
-import io.github.sceneview.animation.Transition.animateScale
 import io.github.sceneview.math.Position
 import io.github.sceneview.math.Rotation
-import io.github.sceneview.math.Scale
 import io.github.sceneview.node.ModelNode
 import io.github.sceneview.node.Node
 import io.github.sceneview.rememberCameraManipulator
@@ -122,6 +110,17 @@ fun TreeDetails(navController: NavController, treeData: TreeData, isImageTapped:
     }
 
     val scrollState = rememberScrollState()
+
+    fun getDisplayImage(id: String): Int {
+        return when (id) {
+            "Flame tree" -> R.drawable.flame
+            "Rain tree" -> R.drawable.rain
+            "Golden shower tree" -> R.drawable.goldenshower
+            "Tambis" -> R.drawable.tambis
+            "Ylang-ylang" -> R.drawable.ylang
+            else -> R.drawable.flame
+        }
+    }
 
     fun getImagesForId(id: String): List<Int> {
         return when (id) {
@@ -173,6 +172,7 @@ fun TreeDetails(navController: NavController, treeData: TreeData, isImageTapped:
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier
                         .background(color = accentGreen)
+                        .fillMaxWidth()
                         .animateContentSize()
                         .then(
                             if (isFullImageMode.value) {
@@ -183,15 +183,26 @@ fun TreeDetails(navController: NavController, treeData: TreeData, isImageTapped:
                             }
                         )
                 ) {
-                    if(isFullImageMode.value) {
-                        Text("Rotate, pinch to zoom in or out to explore tree details",
-                            style = h2.copy(color = primaryGreen, textAlign = TextAlign.Center),
-                            modifier = Modifier.padding(20.dp),
 
-                        )
-                    }
-                    modelScene(isFullImageMode)
 
+                    if(treeData.nativeName == "Kalachuchi") {
+                        if(isFullImageMode.value) {
+                            Text("Rotate, pinch to zoom in or out to explore tree details",
+                                style = h2.copy(color = primaryGreen, textAlign = TextAlign.Center),
+                                modifier = Modifier.padding(20.dp),
+
+                                )
+                        }
+
+                        if (!isImageTapped.value)
+                            modelScene(isFullImageMode)
+                    }else {
+                    Image(
+                        modifier = Modifier.fillMaxSize().padding(20.dp),
+                        painter = painterResource(id = getDisplayImage(treeData.nativeName)),
+                        contentDescription = null,
+                        contentScale = ContentScale.Fit,
+                    ) }
                 }
 
                 AnimatedVisibility(
@@ -229,7 +240,7 @@ fun TreeDetails(navController: NavController, treeData: TreeData, isImageTapped:
 
                             ) {
                                 getImagesForId(treeData.nativeName).forEach { image ->
-                                    val width = (LocalConfiguration.current.screenWidthDp.dp - 50.dp) / 3.dp
+                                    val width = (LocalConfiguration.current.screenWidthDp.dp - (if (getImagesForId(treeData.nativeName).count() > 3) 70.dp else 50.dp)) / 3.dp
                                     Box(
                                         modifier = Modifier
                                             .clip(RoundedCornerShape(5.dp))
