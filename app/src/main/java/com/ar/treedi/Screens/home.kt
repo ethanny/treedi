@@ -105,7 +105,7 @@ fun Home(navController: NavController){
                     Spacer(Modifier.height(20.dp))
 
                     ActionButton("Start scanning", icon = Lucide.ScanLine, {
-                        navController.navigate("treeDetail")
+                        navController.navigate("qr_scan")
                     })
                 }
 
