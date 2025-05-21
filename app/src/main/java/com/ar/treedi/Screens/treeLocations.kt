@@ -15,6 +15,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
@@ -40,7 +41,6 @@ import com.ar.treedi.ui.theme.primaryGreen
 import com.ar.treedi.ui.theme.AppTypography.b1
 import com.ar.treedi.ui.theme.AppTypography.b2
 import com.ar.treedi.ui.theme.AppTypography.h2
-import com.ar.treedi.Components.NavButton
 import com.ar.treedi.ui.theme.AppTypography.h3
 
 data class TreeLocation(
@@ -63,14 +63,12 @@ fun TreeLocations(
 
     Scaffold(
         topBar = {
-            Column(
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(color = Color(0xFFB8D1CA))
                     .windowInsetsPadding(WindowInsets.statusBars)
                     .padding(vertical = 10.dp, horizontal = 20.dp),
-                verticalArrangement = Arrangement.spacedBy(10.dp, Alignment.Top),
-                horizontalAlignment = Alignment.Start
             ) {
                 Row(
                     modifier = Modifier

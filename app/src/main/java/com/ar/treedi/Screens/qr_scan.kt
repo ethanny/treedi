@@ -29,7 +29,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
-import com.ar.treedi.Components.BackButton
 import com.ar.treedi.Components.QROverlay
 import com.composables.icons.lucide.ArrowLeft
 import kotlinx.coroutines.delay

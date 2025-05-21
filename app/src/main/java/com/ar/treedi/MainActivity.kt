@@ -4,9 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
+import androidx.compose.animation.EnterTransition
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -21,14 +19,11 @@ import com.ar.treedi.Screens.TreeLocations
 import com.ar.treedi.ui.theme.AppTypography.h1
 import com.ar.treedi.ui.theme.TreediTheme
 import com.ar.treedi.models.TreeData
-import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.EnterTransition
-import androidx.compose.animation.ExitTransition
-import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
+import com.ar.treedi.Screens.NoTree
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -80,15 +75,15 @@ fun TreediNav() {
         }
 
         composable("treeDetail") {
-            val treeData = TreeData("Kalachuchi", "", "", "", "", "", "","","","","", "")
-//            val treeData = navController.currentBackStackEntry
-//                ?.savedStateHandle
-//                ?.get<TreeData>("treeData")
+//            val treeData = TreeData("Kalachuchi", "", "", "", "", "", "","","","","", "")
+            val treeData = navController.currentBackStackEntry
+                ?.savedStateHandle
+                ?.get<TreeData>("treeData")
 
             if (treeData != null) {
                 TreeDetails(navController, treeData)
             } else {
-                Text("No tree data found.")
+                NoTree(navController)
             }
         }
 
